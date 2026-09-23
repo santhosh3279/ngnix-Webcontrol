@@ -84,6 +84,23 @@ After setup, edit `data/` files directly or use Nginx UI for site edits. `templa
 
 For an unprotected domain, copy `public.conf`; omit both Authelia includes. Unlisted domains that **do** call Authelia are denied by default. Keep the authentication portal itself free of `auth_request` to avoid a login loop.
 
+### Fix WebSockets on an existing installation
+
+The generated files under `data/` are persistent, so editing `templates/` does not alter an installation that has already been initialized. If Nginx UI still reports a WebSocket failure after upgrading, apply the same forwarded-scheme fix to the active files:
+
+```sh
+docker compose exec nginx nginx -T | grep -E 'forwarded_proto|forwarded_host'
+```
+
+If those variables are absent, copy the current templates into the generated configuration, preserving any site edits, or run the Nginx UI **System → Self Check → Bundled nginx-ui.conf has WebSocket reverse-proxy fix → Attempt to fix**. Then reload:
+
+```sh
+docker compose exec nginx nginx -t
+docker compose exec nginx nginx -s reload
+```
+
+The fix preserves `X-Forwarded-Proto` and `X-Forwarded-Host` from an outer TLS-terminating proxy. This is required when another Nginx, Cloudflare, or similar proxy sits in front of the bundled Nginx.
+
 For unrelated parent domains, add a separate `session.cookies` entry and reachable auth portal for each parent domain, as described in the [Authelia session documentation](https://www.authelia.com/configuration/session/introduction/).
 
 ## Connect your applications
