@@ -1,0 +1,56 @@
+name: nginx-webcontrol
+services:
+  nginx:
+    image: ${NGINX_UI_IMAGE:-uozi/nginx-ui:v2.6.3}
+    restart: unless-stopped
+    ports:
+      - "${HTTP_BIND:-0.0.0.0}:80:80"
+      - "${HTTPS_BIND:-0.0.0.0}:443:443"
+      - "127.0.0.1:${UI_PORT:-9000}:8080"
+    environment:
+      TZ: ${TZ:-Etc/UTC}
+      NGINX_UI_PRESERVE_BUNDLED_CONF: "true"
+    volumes:
+      - ./data/nginx:/etc/nginx
+      - ./data/nginx-ui:/etc/nginx-ui
+      - ./data/certs:/etc/nginx/certs:ro
+      - ./data/www:/var/www
+      - nginx_logs:/var/log/nginx
+    networks: [proxy]
+    depends_on:
+      authelia:
+        condition: service_healthy
+      demo:
+        condition: service_started
+    healthcheck:
+      test: [CMD-SHELL, "nginx -t && curl -fsS http://127.0.0.1:8080/ >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  authelia:
+    image: ${AUTHELIA_IMAGE:-authelia/authelia:4.39.28}
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Etc/UTC}
+      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/session
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/storage
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /run/secrets/jwt
+    secrets: [session, storage, jwt]
+    volumes:
+      - ./data/authelia:/config
+    networks: [proxy]
+  demo:
+    image: traefik/whoami:v1.11.0
+    restart: unless-stopped
+    networks: [proxy]
+networks:
+  proxy:
+volumes:
+  nginx_logs:
+secrets:
+  session:
+    file: ./secrets/session
+  storage:
+    file: ./secrets/storage
+  jwt:
+    file: ./secrets/jwt

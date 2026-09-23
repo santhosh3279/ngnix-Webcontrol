@@ -1,0 +1,37 @@
+server:
+  address: tcp://:9091/
+log:
+  level: info
+totp:
+  issuer: __DOMAIN__
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: argon2
+access_control:
+  default_policy: deny
+  rules:
+    - domain: secure.__DOMAIN__
+      policy: two_factor
+session:
+  name: authelia_session
+  same_site: lax
+  inactivity: 5m
+  expiration: 1h
+  remember_me: 1M
+  cookies:
+    - domain: __DOMAIN__
+      authelia_url: https://auth.__DOMAIN__
+      default_redirection_url: https://secure.__DOMAIN__
+regulation:
+  max_retries: 3
+  find_time: 2m
+  ban_time: 5m
+storage:
+  local:
+    path: /config/db.sqlite3
+# Local bootstrap delivery. Replace with SMTP before production use.
+notifier:
+  filesystem:
+    filename: /config/notification.txt
