@@ -1,7 +1,7 @@
 # Nginx + Nginx UI + Authelia
 
 Docker Compose reverse proxy with two-factor authentication on selected domains.
-Nginx and Nginx UI run together in the official Nginx UI image so UI edits and reloads affect the actual proxy. Authelia runs separately with a file-based user directory, SQLite storage, and authenticator-app TOTP. No Docker socket is mounted.
+Nginx and Nginx UI run together in the official Nginx UI image so UI edits and reloads affect the actual proxy. Authelia runs separately with a file-based user directory, SQLite storage, and authenticator-app TOTP. No Docker socket is mounted, and `NGINX_UI_IGNORE_DOCKER_SOCKET=true` disables its setup check. The management proxy forwards HTTP/1.1 Upgrade and Connection headers, disables response buffering, and keeps long-lived WebSocket connections open. Upgrade the Nginx UI container through Docker Compose instead of the UI's Docker-based OTA updater: update `NGINX_UI_IMAGE` in `.env`, then run `docker compose pull nginx && docker compose up -d nginx`.
 
 | Address | Behavior |
 | --- | --- |

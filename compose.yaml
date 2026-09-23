@@ -10,6 +10,7 @@ services:
     environment:
       TZ: ${TZ:-Etc/UTC}
       NGINX_UI_PRESERVE_BUNDLED_CONF: "true"
+      NGINX_UI_IGNORE_DOCKER_SOCKET: "true"
     volumes:
       - ./data/nginx:/etc/nginx
       - ./data/nginx-ui:/etc/nginx-ui
