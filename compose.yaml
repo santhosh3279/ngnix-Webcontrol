@@ -4,9 +4,9 @@ services:
     image: ${NGINX_UI_IMAGE:-uozi/nginx-ui:v2.6.3}
     restart: unless-stopped
     ports:
-      - "${HTTP_BIND:-0.0.0.0}:8080:80"
+      - "${HTTP_BIND:-0.0.0.0}:80:80"
       - "${HTTPS_BIND:-0.0.0.0}:443:443"
-      - "${UI_BIND:-0.0.0.0}:${UI_PORT:-9000}:8080"
+      - "${UI_BIND:-0.0.0.0}:${UI_PORT:-9090}:9000"
     environment:
       TZ: ${TZ:-Etc/UTC}
       NGINX_UI_PRESERVE_BUNDLED_CONF: "true"
@@ -24,7 +24,7 @@ services:
       demo:
         condition: service_started
     healthcheck:
-      test: [CMD-SHELL, "nginx -t && curl -fsS http://127.0.0.1:8080/ >/dev/null"]
+      test: [CMD-SHELL, "nginx -t && curl -fsS http://127.0.0.1:9000/ >/dev/null"]
       interval: 30s
       timeout: 10s
       retries: 3

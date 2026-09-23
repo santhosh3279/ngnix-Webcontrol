@@ -8,7 +8,7 @@ Nginx and Nginx UI run together in the official Nginx UI image so UI edits and r
 | `auth.example.com` | Authelia login and 2FA enrollment |
 | `secure.example.com` | Demo backend, requires password and TOTP |
 | `public.example.com` | Demo backend, no Authelia authentication |
-| `http://SERVER-IP:9000` | Nginx UI, accessible directly on any host IPv4 interface |
+| `http://SERVER-IP:9090` | Nginx UI, accessible directly on any host IPv4 interface |
 
 ## Setup
 
@@ -42,7 +42,7 @@ Requires Docker Engine with Compose v2+, Python 3, and OpenSSL. Ports 8080 and 4
 
 5. Open `https://secure.example.com`, sign in as `admin`, and enroll your authenticator. The bootstrap notifier writes enrollment verification links to `data/authelia/notification.txt`; read that private file on the host. The self-signed certificate needs a browser exception on both the application and auth host for this initial test.
 
-6. Open Nginx UI at `http://SERVER-IP:9000` (for example, `http://192.168.225.135:9000`) and create a **separate Nginx UI administrator account**. If requested, retrieve the one-time installation secret:
+6. Open Nginx UI at `http://SERVER-IP:9090` (for example, `http://192.168.225.135:9090`) and create a **separate Nginx UI administrator account**. If requested, retrieve the one-time installation secret:
 
    ```sh
    docker compose exec nginx cat /etc/nginx-ui/.install_secret
