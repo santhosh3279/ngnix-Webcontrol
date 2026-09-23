@@ -8,7 +8,7 @@ Nginx and Nginx UI run together in the official Nginx UI image so UI edits and r
 | `auth.example.com` | Authelia login and 2FA enrollment |
 | `secure.example.com` | Demo backend, requires password and TOTP |
 | `public.example.com` | Demo backend, no Authelia authentication |
-| `http://127.0.0.1:9000` | Nginx UI, accessible from the Docker host |
+| `http://SERVER-IP:9000` | Nginx UI, accessible directly on any host IPv4 interface |
 
 ## Setup
 
@@ -42,13 +42,13 @@ Requires Docker Engine with Compose v2+, Python 3, and OpenSSL. Ports 8080 and 4
 
 5. Open `https://secure.example.com`, sign in as `admin`, and enroll your authenticator. The bootstrap notifier writes enrollment verification links to `data/authelia/notification.txt`; read that private file on the host. The self-signed certificate needs a browser exception on both the application and auth host for this initial test.
 
-6. Open Nginx UI at `http://127.0.0.1:9000` on the Docker host and create a **separate Nginx UI administrator account**. If requested, retrieve the one-time installation secret:
+6. Open Nginx UI at `http://SERVER-IP:9000` (for example, `http://192.168.225.135:9000`) and create a **separate Nginx UI administrator account**. If requested, retrieve the one-time installation secret:
 
    ```sh
    docker compose exec nginx cat /etc/nginx-ui/.install_secret
    ```
 
-   For a remote server, run this on your workstation and then open the same local URL:
+   `UI_BIND` defaults to `0.0.0.0`, listening on all host IPv4 interfaces. Browse using the server's actual IP address. If your existing `.env` pins `UI_BIND` to a specific IP, change it to `0.0.0.0`. For SSH-tunnel-only access, set `UI_BIND=127.0.0.1`, recreate Nginx with `docker compose up -d nginx`, then run this on your workstation and open `http://localhost:9000`:
 
    ```sh
    ssh -N -L 9000:127.0.0.1:9000 user@your-server
@@ -106,7 +106,7 @@ The shared network is for trusted backend services only. Publicly reachable back
   ```
 
   Store the password in `secrets/smtp`, add it to Compose `secrets` and the Authelia service's secret list, and set `AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /run/secrets/smtp`. Remove the `filesystem` block. Recreate Authelia with `docker compose up -d authelia` after changing Compose settings.
-- Keep Nginx UI on host loopback or a private management network. The UI has authority to change proxy security rules. Do not replace its local-only listener with the upstream public default during a UI configuration check.
+- Nginx UI is published on all host IPv4 interfaces by default (`UI_BIND=0.0.0.0`) at port 9000. Keep this management endpoint on your trusted network; it has authority to change proxy security rules. Use `UI_BIND=127.0.0.1` for SSH-tunnel-only access. Application routes on ports 8080 and 443 still require their configured domain names; this setting exposes only the management UI by IP.
 - Back up `data/`, `secrets/`, and `.env` securely. Stop the stack before a simple file-copy backup so SQLite is consistent. The storage encryption key is required to recover enrolled 2FA devices; do not regenerate it during upgrades.
 - The generated runtime files, credentials, certificates, and secrets are gitignored. Versioned image defaults can be changed in `.env`; review upstream releases before updating.
 

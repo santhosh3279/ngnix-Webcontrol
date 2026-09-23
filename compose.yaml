@@ -6,7 +6,7 @@ services:
     ports:
       - "${HTTP_BIND:-0.0.0.0}:8080:80"
       - "${HTTPS_BIND:-0.0.0.0}:443:443"
-      - "127.0.0.1:${UI_PORT:-9000}:8080"
+      - "${UI_BIND:-0.0.0.0}:${UI_PORT:-9000}:8080"
     environment:
       TZ: ${TZ:-Etc/UTC}
       NGINX_UI_PRESERVE_BUNDLED_CONF: "true"
