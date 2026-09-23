@@ -12,7 +12,7 @@ Nginx and Nginx UI run together in the official Nginx UI image so UI edits and r
 
 ## Setup
 
-Requires Docker Engine with Compose v2+, Python 3, and OpenSSL. Ports 80 and 443 must be free. These instructions assume Nginx is the internet-facing proxy and terminates TLS directly.
+Requires Docker Engine with Compose v2+, Python 3, and OpenSSL. Ports 8080 and 443 must be free. Host port 80 remains available for your existing service. Access application domains directly over HTTPS; configure normal HTTP redirects and HTTP ACME challenge forwarding in the existing port-80 service. These instructions assume Nginx is the internet-facing proxy and terminates TLS directly.
 
 1. Generate your initial Authelia password hash. Enter your password at the interactive prompt:
 
