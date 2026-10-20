@@ -13,6 +13,7 @@ services:
       NGINX_UI_IGNORE_DOCKER_SOCKET: "true"
     volumes:
       - ./data/nginx:/etc/nginx
+      - ./data/certs-terminal:/etc/letsencrypt:ro
       - ./data/nginx-ui:/etc/nginx-ui
       - ./data/certs:/etc/nginx/certs:ro
       - ./data/www:/var/www
@@ -28,6 +29,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+  wedding-invite:
+    build:
+      context: /home/cups/inviti2u.in/wedding-invitation
+      dockerfile: /home/cups/ngnix-Webcontrol/docker/wedding-invite/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+    networks: [proxy]
   authelia:
     image: ${AUTHELIA_IMAGE:-authelia/authelia:4.39.28}
     restart: unless-stopped

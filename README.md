@@ -147,3 +147,18 @@ Session state is kept in memory for this single Authelia instance, so restarting
 References: [Nginx UI Docker installation](https://nginxui.com/guide/getting-started#install-with-docker), [Authelia Nginx integration](https://www.authelia.com/integration/proxies/nginx/).
 
 Validation performed with the pinned images: Compose parsing, generated configuration, Authelia validation, Nginx syntax and container health, public/portal HTTP 200, protected redirect, rejection of spoofed identity headers, inaccessible internal authorization endpoint, and password-only sessions still requiring 2FA. With Authelia stopped, the protected route returned 500 while the public route remained available. Browser-based TOTP enrollment and trusted-certificate issuance require your domain setup and were not exercised.
+
+## Wedding invitation site
+
+The public proxy serves `https://myinvite2u.in` and `https://*.myinvite2u.in` through the Frappe Docker frontend at `http://192.168.225.189:8080`. HTTP redirects to HTTPS. The apex and wildcard configurations are stored in `docker/wedding-invite/invite2u.conf` and `invite2u-wildcard.conf`, with active copies under `data/nginx/sites-available/`. All application paths, assets, uploads, and Socket.IO traffic go through port 8080. The original Host and forwarding headers are preserved; the Docker frontend sets its configured Frappe site name.
+
+The separate legacy `wedding-invite` service builds the Next.js application from `/home/cups/inviti2u.in/wedding-invitation`; it is not the current public Frappe upstream.
+
+Rebuild after application changes:
+
+```sh
+docker compose build wedding-invite
+docker compose up -d wedding-invite
+```
+
+The Let's Encrypt certificate covers the apex and wildcard and expires January 5, 2027. It was issued with manual DNS-01 validation, so renewal requires fresh TXT records; see [certificate renewal](docker/wedding-invite/TLS.md). The deployment build removes the original GitHub Pages URL prefix from asset paths. It omits the guestbook because this checkout has no Supabase credentials. These adjustments occur inside the image; the application source remains unchanged.
