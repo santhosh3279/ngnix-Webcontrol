@@ -50,6 +50,22 @@ services:
     volumes:
       - ./data/authelia:/config
     networks: [proxy]
+    depends_on:
+      redis:
+        condition: service_healthy
+  redis:
+    image: ${REDIS_IMAGE:-redis:7.4.2-alpine}
+    restart: unless-stopped
+    # Persist Authelia sessions across restarts; not published outside the proxy network.
+    command: [redis-server, --appendonly, "yes", --save, "60", "1"]
+    volumes:
+      - redis_data:/data
+    networks: [proxy]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   demo:
     image: traefik/whoami:v1.11.0
     restart: unless-stopped
@@ -58,6 +74,7 @@ networks:
   proxy:
 volumes:
   nginx_logs:
+  redis_data:
 secrets:
   session:
     file: ./secrets/session
