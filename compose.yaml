@@ -31,8 +31,10 @@ services:
       retries: 3
   wedding-invite:
     build:
-      context: /home/cups/inviti2u.in/wedding-invitation
-      dockerfile: /home/cups/ngnix-Webcontrol/docker/wedding-invite/Dockerfile
+      context: ./docker/wedding-invite
+      # Application source checkout; set WEDDING_INVITE_SRC in .env.
+      additional_contexts:
+        app: ${WEDDING_INVITE_SRC:-./wedding-invitation}
     restart: unless-stopped
     environment:
       NODE_ENV: production

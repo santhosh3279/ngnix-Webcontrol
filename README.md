@@ -152,7 +152,7 @@ Validation performed with the pinned images: Compose parsing, generated configur
 
 The public proxy serves `https://myinvite2u.in` and `https://*.myinvite2u.in` through the Frappe Docker frontend at `http://192.168.225.189:8080`. HTTP redirects to HTTPS. The apex and wildcard configurations are stored in `docker/wedding-invite/invite2u.conf` and `invite2u-wildcard.conf`, with active copies under `data/nginx/sites-available/`. All application paths, assets, uploads, and Socket.IO traffic go through port 8080. The original Host and forwarding headers are preserved; the Docker frontend sets its configured Frappe site name.
 
-The separate legacy `wedding-invite` service builds the Next.js application from `/home/cups/inviti2u.in/wedding-invitation`; it is not the current public Frappe upstream.
+The separate legacy `wedding-invite` service builds the Next.js application from the checkout named by `WEDDING_INVITE_SRC` in `.env` (default `./wedding-invitation`); it is not the current public Frappe upstream.
 
 Rebuild after application changes:
 

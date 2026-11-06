@@ -1,11 +1,11 @@
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY package.json package-lock.json ./
+COPY --from=app package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
-COPY src ./src
-COPY public ./public
-COPY tsconfig.json postcss.config.mjs tailwind.config.ts .eslintrc.json ./
+COPY --from=app src ./src
+COPY --from=app public ./public
+COPY --from=app tsconfig.json postcss.config.mjs tailwind.config.ts .eslintrc.json ./
 # Deploy at the domain root rather than the original GitHub Pages subdirectory.
 RUN printf 'module.exports = { reactStrictMode: true };\n' > next.config.js
 RUN find src -type f -exec sed -i -e 's|/wedding-invitation/|/|g' -e 's|wedding-invitation/images/|/images/|g' {} +
