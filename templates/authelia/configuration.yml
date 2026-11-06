@@ -17,9 +17,13 @@ access_control:
 session:
   name: authelia_session
   same_site: lax
-  inactivity: 5m
-  expiration: 1h
-  remember_me: 1M
+  inactivity: 1y
+  expiration: 1y
+  remember_me: 1y
+  # Sessions live in the compose `redis` service so restarts don't log users out.
+  redis:
+    host: redis
+    port: 6379
   cookies:
     - domain: __DOMAIN__
       authelia_url: https://auth.__DOMAIN__
