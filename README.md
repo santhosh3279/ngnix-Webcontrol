@@ -142,7 +142,7 @@ docker compose exec nginx nginx -t && docker compose exec nginx nginx -s reload
 docker compose down
 ```
 
-Session state is kept in the `redis` service (persisted in the `redis_data` volume), so restarting Authelia or the host does not log users out. Sessions last one year (`inactivity`, `expiration` and `remember_me` are `1y`). To log users out from the server: set `disabled: true` for a user in `data/authelia/users_database.yml` or change their password (takes effect within the 1-minute `refresh_interval`), or end every session with `docker compose exec redis redis-cli FLUSHALL`. SQLite and TOTP enrollment persist in `data/authelia/`.
+Session state is kept in the `redis` service (persisted in the `redis_data` volume), so restarting Authelia or the host does not log users out. Without "Remember me", a session ends after 5 minutes of inactivity or 1 hour at most (`inactivity: 5m`, `expiration: 1h`); with "Remember me" checked it lasts one year (`remember_me: 1y`). To log users out from the server: set `disabled: true` for a user in `data/authelia/users_database.yml` or change their password (takes effect within the 1-minute `refresh_interval`), or end every session with `docker compose exec redis redis-cli FLUSHALL`. SQLite and TOTP enrollment persist in `data/authelia/`.
 
 References: [Nginx UI Docker installation](https://nginxui.com/guide/getting-started#install-with-docker), [Authelia Nginx integration](https://www.authelia.com/integration/proxies/nginx/).
 
